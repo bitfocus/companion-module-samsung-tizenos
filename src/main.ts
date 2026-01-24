@@ -124,7 +124,15 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 		try {
 			const res = await got(url, options)
 
-			if (res.statusCode >= 400) {
+			if (
+				(res.statusCode === 401 && urlsuffix !== '/api/v1/auth/login') ||
+				(res.statusCode === 403 && urlsuffix !== '/api/v1/auth/login')
+			) {
+				this.log('warn', 'API returned Unauthorized')
+				await this.login().catch((err) => this.log('error', `Login failed: ${err.message || err}`))
+			}
+
+			if (res.statusCode >= 404) {
 				const err: any = new Error(`Api Request failed ${res.statusCode}`)
 				err.status = res.statusCode
 				err.data = res.body
@@ -238,8 +246,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 	async init(config: ModuleConfig): Promise<void> {
 		this.config = config
-
-		this.updateStatus(InstanceStatus.Ok)
+		this.updateStatus(InstanceStatus.Connecting)
 
 		this.updateActions() // export actions
 		this.updateFeedbacks() // export feedbacks
