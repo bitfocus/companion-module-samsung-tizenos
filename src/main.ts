@@ -201,7 +201,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 			// Token speichern
 			this._token = data.access_token
-			const expires = data.expires_in ? Number(data.expires_in) : 86400
+			const expires = 3600
 
 			this.log('info', 'Login succeeded')
 			this.log('debug', 'Token is ' + data.access_token + ', expires in ' + expires + ' seconds')
